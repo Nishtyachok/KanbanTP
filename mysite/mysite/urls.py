@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('kanban/', include('kanban.urls')),
+    path('', include('users.urls')),
+    path('boards/', include('kanban.urls')),
     path('admin/', admin.site.urls),
+    path('', include('django.contrib.auth.urls'))
 ]

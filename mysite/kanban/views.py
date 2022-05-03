@@ -44,11 +44,16 @@ class Projects(View):
 
 
 class DeleteProject(View):
-    def post(self, request, id):
-        Project.objects.filter(id=id).delete()
-        response = JsonResponse({"message": "OK"})
-        response.status_code = 200
-        return response
+    def get(self, request, id):
+        try:
+            proj = Project.objects.get(id=id)
+        except:
+            return redirect('boards')
+        if request.user.id == proj.owner.id:
+            proj.delete()
+            response = JsonResponse({"message": "OK"})
+            response.status_code = 200
+        return redirect('boards')
 
 
 # # class Tasks(View):

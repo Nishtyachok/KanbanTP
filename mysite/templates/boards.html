@@ -32,21 +32,67 @@
             </div>
         </div>
     </div>
-    <div class="d-flex flex-row justify-content-center mt-5">
-        {% for p in projects %}
-            <div class="p-2">
+    <div class="container mt-4">
+        <div class="row  justify-content-md-center">
+            {% for p in projects %}
+            <div class="col-md-auto">
+              <div class="p-2">
                 <div class="card" style="width: 18rem; background-color: #A6D5F7;">
                     <div class="card-body">
                         <h5 class="card-title">{{ p.name }}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">{{ p.description }}</h6>
                         <p class="card-text">{{ p.details }}</p>
-                        <a href="#" class="card-link btn btn-primary" role="button">Перейти</a>
+                        <div class="container">
+                            <div class="row justify-content-md-center">
+                                <div class="col-">
+                                    <a href="#" class="card-link btn btn-primary" role="button">Перейти</a>
+                                </div>
+                                <div class="col- ml-5">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                          Действия
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                          <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#exampleModalCenter-{{p.id}}">
+                                              Удалить
+                                          </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+              </div>
             </div>
-        {% endfor %}
+                <div class="modal fade" id="exampleModalCenter-{{p.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle">Удаление</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                        <p> Вы действительно хотите удалить {{p.name}} ?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <form>
+                            <button type="submit" class="btn btn-danger" formaction="{{p.id}}/delete">
+                               Удалить
+                             </button>
+                        </form>
 
+                    </div>
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+
     <nav aria-label="Page navigation" class="fixed-bottom ">
         <ul class="pagination pagination-lg justify-content-center">
             <li class="page-item">

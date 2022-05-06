@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %} {{proj.name}} {% endblock %}
+{% load crispy_forms_tags %}
+{% block name %}{{proj.name}}{% endblock %}
+{% block content %}
+
+        <form method="POST" >
+            {% csrf_token %}
+            <div class="form-row justify-content-end">
+                <div class="col-3">
+                    {{row_form|crispy}}
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
+                    </svg>
+                    Добавить колонку
+                    </button>
+                </div>
+
+            </div>
+        </form>
+
+
+    <div class="container">
+      <div class="row" style="height: 400px; ">
+          {% for r in rows %}
+          <div class="col-sm-3 h-100 border text-center rounded border-primary"
+                style="background-color: rgba(135,206,250, 0.3);">
+              <h5>{{ r.name }}</h5>
+              <hr class="mt-2 mb-4" style="border-color: rgba(135,206,250, 1);">
+          </div>
+          {% endfor %}
+      </div>
+    </div>
+    <nav aria-label="Page navigation" class="fixed-bottom ">
+        <ul class="pagination pagination-lg justify-content-center">
+            <li class="page-item">
+                    {% if rows.has_previous%}
+                        <a class="page-link" href="?page={{ rows.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    {% else %}
+                        <a class="page-link" href="?page=1" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                          <span class="sr-only">Previous</span>
+                        </a>
+                    {% endif%}
+            </li>
+            <li class="page-item">
+                {% if rows.has_next %}
+                    <a class="page-link" href="?page={{ rows.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                {% else %}
+                    <a class="page-link" href="?page={{ rows.paginator.num_pages }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+{% endblock %}

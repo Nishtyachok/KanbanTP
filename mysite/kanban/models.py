@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import ModelForm
+from django.forms import ModelForm, TextInput
 
 
 class Project(models.Model):
@@ -24,6 +24,28 @@ class ProjectForm(ModelForm):
         model = Project
         fields = '__all__'
         exclude = ('owner',)
+
+
+class Row(models.Model):
+    name = models.CharField(max_length=50,)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class RowForm(ModelForm):
+
+    class Meta:
+        model = Row
+        fields = '__all__'
+        exclude = ('project',)
+        labels = {
+            'name': '',
+        }
+        widgets = {
+            'name': TextInput(attrs={'placeholder': 'Введите название'}),
+        }
 
 
 class Task(models.Model):

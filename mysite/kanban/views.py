@@ -1,9 +1,10 @@
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Project, Task, ProjectForm
+from .models import Project, Task, ProjectForm, RowForm, Row
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from django.core.paginator import Paginator
 
@@ -51,43 +52,54 @@ class DeleteProject(View):
             return redirect('boards')
         if request.user.id == proj.owner.id:
             proj.delete()
-            response = JsonResponse({"message": "OK"})
-            response.status_code = 200
         return redirect('boards')
 
 
-# # class Tasks(View):
-#     def get(self, request, id):
-#         if not request.user.is_authenticated:
-#             return redirect("signIn")
-#
-#         proj = Project.objects.filter(id=id).first()
-#         user = request.user
-#         users = User.objects.filter(Q(id__in=proj.get_members()) | Q(id=proj.owner.id))
-#         data = {"user": user,
-#                 "first": user.username[0],
-#                 "other_users": users,
-#                 "tasks": proj.task_set.all(),
-#                 'proj': proj,
-#                 "can_add": user == proj.owner
-#                 }
-#         return render(request, 'tasks.html', data)
-#
-#     def post(self, request, id):
-#         if not request.user.is_authenticated:
-#             return redirect('signIn')
-#
-#         name = request.POST['name']
-#         description = request.POST['desc']
-#         assigned_to = request.POST['users']
-#         status = 'T'
-#         end_time = request.POST['date']
-#
-#         task = Task(name=name, description=description, assigned_to_id=assigned_to, status=status,
-#                     end_time=end_time, project_id=id)
-#         task.save()
-#
-#         return redirect('tasks', id=id)
+class Tasks(View):
+    def get(self, request, id):
+        if not request.user.is_authenticated:
+            return redirect("/")
+        proj = Project.objects.filter(id=id).first()
+        user = request.user
+        # users = User.objects.filter(Q(id__in=proj.get_members()) | Q(id=proj.owner.id))
+        rows = Row.objects.filter(project_id=id)
+        print(rows)
+        paginator = Paginator(rows, 4)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        data = {"user": user,
+                "first": user.username[0],
+                # "tasks": proj.task_set.all(),
+                'proj': proj,
+                'rows': page_obj,
+                "can_add": user == proj.owner,
+                "row_form": RowForm(),
+                }
+        return render(request, 'tasks.html', data)
+
+    def post(self, request, id):
+        if not request.user.is_authenticated:
+            return redirect('/')
+        form = RowForm(request.POST)
+        if form.is_valid():
+            s_form = form.save(commit=False)
+            s_form.project = Project.objects.filter(id=id).first()
+            s_form.save()
+        return redirect(f'/boards/{id}')
+
+
+    # def post(self, request, id):
+    #     if not request.user.is_authenticated:
+    #         return redirect('sign
+    #     name = request.POST['name']
+    #     description = request.POST['desc']
+    #     assigned_to = request.POST['users']
+    #     status = 'T'
+    #     end_time = request.POST['da
+    #     task = Task(name=name, description=description, assigned_to_id=assigned_to, status=status,
+    #                 end_time=end_time, project_id=id)
+    #     task.sa
+    #     return redirect('tasks', id=id)
 #
 #
 # class ManegeTasks(View):

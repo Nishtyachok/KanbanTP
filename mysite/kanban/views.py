@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Project, Task, ProjectForm, RowForm, Row
+from .models import Project, Task, ProjectForm, RowForm, Row, TaskForm, Team
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from django.core.paginator import Paginator
 
@@ -14,12 +14,8 @@ class Projects(View):
         if not request.user.is_authenticated:
             return redirect('/')
         user = request.user
-        try:
-            user_projects = get_objects_for_user(user,
-                                                 perms=['kanban.member_project', ],
-                                                 klass=Project)
-        except:
-            user_projects = []
+        user_projects = Project.objects.filter(team__members__id=user.id)
+
         paginator = Paginator(user_projects, 3)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -39,7 +35,6 @@ class Projects(View):
             s_form = form.save(commit=False)
             s_form.owner = user
             s_form.save()
-            assign_perm('Project.member_project', user, Project.objects.get(id=s_form.id))
 
         return redirect('boards')
 
@@ -63,43 +58,41 @@ class Tasks(View):
         user = request.user
         # users = User.objects.filter(Q(id__in=proj.get_members()) | Q(id=proj.owner.id))
         rows = Row.objects.filter(project_id=id)
-        print(rows)
         paginator = Paginator(rows, 4)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         data = {"user": user,
                 "first": user.username[0],
-                # "tasks": proj.task_set.all(),
+                "tasks": proj.task_set.all(),
                 'proj': proj,
                 'rows': page_obj,
                 "can_add": user == proj.owner,
                 "row_form": RowForm(),
+                "task_form": TaskForm(),
                 }
         return render(request, 'tasks.html', data)
 
     def post(self, request, id):
         if not request.user.is_authenticated:
             return redirect('/')
-        form = RowForm(request.POST)
-        if form.is_valid():
-            s_form = form.save(commit=False)
-            s_form.project = Project.objects.filter(id=id).first()
-            s_form.save()
+        if request.POST.get('row_add'):
+            row_form = RowForm(request.POST)
+            if row_form.is_valid():
+                s_form = row_form.save(commit=False)
+                s_form.project = Project.objects.filter(id=id).first()
+                s_form.save()
+        if request.POST.get('task_add'):
+            task_form = TaskForm(request.POST)
+            if task_form.is_valid():
+                s_form = task_form.save(commit=False)
+                s_form.project = Project.objects.filter(id=id).first()
+                s_form.row = Row.objects.filter(id=request.POST.get('row_id')).first()
+                s_form.assigned_to = request.user
+                s_form.save()
         return redirect(f'/boards/{id}')
 
 
-    # def post(self, request, id):
-    #     if not request.user.is_authenticated:
-    #         return redirect('sign
-    #     name = request.POST['name']
-    #     description = request.POST['desc']
-    #     assigned_to = request.POST['users']
-    #     status = 'T'
-    #     end_time = request.POST['da
-    #     task = Task(name=name, description=description, assigned_to_id=assigned_to, status=status,
-    #                 end_time=end_time, project_id=id)
-    #     task.sa
-    #     return redirect('tasks', id=id)
+
 #
 #
 # class ManegeTasks(View):

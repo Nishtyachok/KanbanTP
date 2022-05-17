@@ -1,8 +1,11 @@
 from django.urls import path
-from .views import Projects, Tasks, DeleteProject
+from .views import Projects, Tasks, DeleteProject, DeleteRow, DeleteTask
 
 urlpatterns = [
     path('', Projects.as_view(), name='boards'),
-    path('<id>/delete', DeleteProject.as_view(), name='delete board'),
+    path('<id>/deleteProject', DeleteProject.as_view(), name='delete board'),
+    path('boards/<id>/<id_task>/deleteTask', DeleteTask.as_view(), name='delete task'),
+    path('boards/<id>/<id_row>/deleteRow', DeleteRow.as_view(), name='delete row'),
     path('<id>', Tasks.as_view(), name='tasks'),
 ]
+

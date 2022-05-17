@@ -39,70 +39,95 @@
                 style="background-color: rgba(135,206,250, 0.3);">
               <h5>{{ r.name }}</h5>
               <hr class="mt-2 mb-4" style="border-color: rgba(135,206,250, 1);">
-              {%for f in rows%}
-              <div class="card" style="mt-4">
-                <div class="card-body">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-">
-                                <h5 class="card-title">Card title</h5>
-                            </div>
-                            <div class="col- ml-auto">
-                                <div class="dropdown">
-                                    <button class="btn btn-info btn-sm dropdown-toggler" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        ...
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#exampleModalCenter-{{p.id}}">
-                                            Удалить
-                                        </a>
-                                    </div>
+              {% for t in tasks %}
+                    {% if t.row_id == r.id%}
+                        <div class="card" style="mt-4">
+                          <div class="card-body">
+                              <div class="container">
+                                  <div class="row">
+                                      <div class="col-">
+                                          <h5 class="card-title">{{t.name}}</h5>
+                                      </div>
+                                      <div class="col- ml-auto">
+                                          <div class="dropdown">
+                                              <button class="btn btn-info btn-sm dropdown-toggler" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                  ...
+                                              </button>
+                                              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                  <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#exampleModalCenter-{{p.id}}">
+                                                      Удалить
+                                                  </a>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <p class="card-text">{{t.description}}</p>
+                              <div class="container">
+                                  <div class="row">
+                                      <div class="col-">
+                                           <h6 class="card-subtitle mb-2 text-muted">{{t.assigned_to}}</h6>
+                                      </div>
+                                      <div class="col- ml-auto">
+                                            <h6 class="card-subtitle mb-2 text-muted">{{t.start_time}}</h6>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                        <div class="modal fade" id="exampleModalCenter-{{p.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLongTitle">Удаление</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
                                 </div>
+                                <div class="modal-body">
+                                    <p> Вы действительно хотите удалить {{t.name}} ?</p>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                                    <form>
+                                        <button type="submit" class="btn btn-danger" formaction="boards/{{proj.id}}/{{t.id}}/deleteTask">
+                                           Удалить
+                                         </button>
+                                    </form>
+
+                                </div>
+                              </div>
                             </div>
                         </div>
-
-
-                    </div>
-
-                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-                </div>
-              </div>
+                    {% endif %}
               {% endfor %}
-              <button type="button-task" class="btn btn-primary btn-sm mb-4 mt-2"  data-toggle="modal" data-target="#ModalTask" style="background-color:green">Добавить задачу</button>
-
+              <button type="button-task" class="btn btn-primary btn-sm mb-4 mt-2"  data-toggle="modal" data-target="#ModalTask-{{r.id}}" style="background-color:green">Добавить задачу</button>
+                <!--Form Задачи-->
+              <div class="modal fade" id="ModalTask-{{r.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Задача</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                              </button>
+                          </div>
+                          <div class="modal-body">
+                               <form method="POST" class="form-group">
+                                    {% csrf_token %}
+                                    {{ task_form|crispy }}
+                                    <input type="hidden" name="row_id" value={{r.id}} />
+                                    <button type="submit" class="btn btn-success" name="task_add" value="Submit">Добавить задачу</button>
+                               </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
 
           {% endfor %}
       </div>
     </div>
-
-<!--Form Задачи-->
-<div class="modal fade" id="ModalTask" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Задача</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-
-          <div class="form-group">
-            <label for="message-text" class="col-form-label">Напишите задачу:</label>
-            <textarea class="form-control" id="message-text"></textarea>
-         </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-        <button type="button" class="btn btn-primary">Добавить задачу</button>
-
-      </div>
-    </div>
-  </div>
-</div>
-</div>
 
     <nav aria-label="Page navigation" class="fixed-bottom ">
         <ul class="pagination pagination-lg justify-content-center">

@@ -25,7 +25,7 @@
 <!--Кнопка назад -->
         <div class="form-row justify-content-end">
             <a class = "button-back-task" href="/boards">
-              <button type="back" class="btn btn-danger">
+              <button type="back" class="btn btn-danger mb-2">
                     Назад к доскам
                  </button>
             </a>
@@ -37,7 +37,49 @@
           {% for r in rows %}
           <div class="col-sm-3 h-100 border text-center rounded border-primary"
                 style="background-color: rgba(135,206,250, 0.3);">
-              <h5>{{ r.name }}</h5>
+              <div class="container">
+                  <div class="row">
+                      <div class="col- mt-2">
+                          <h5>{{ r.name }}</h5>
+                      </div>
+                      <div class="col- ml-auto">
+                          <div class="dropdown">
+                              <button class="btn btn-sm dropdown-toggler mt-2" type="button" id="dropdownMenuButton1"
+                                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: rgba(135,206,250, 0.3);">
+                                  ☰
+                              </button>
+                              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                  <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#deleteRow-{{r.id}}">
+                                      Удалить
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal fade" id="deleteRow-{{r.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="deleteRowTitle">Удаление</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                              </button>
+                          </div>
+                          <div class="modal-body">
+                              <p> Вы действительно хотите удалить {{r.name}} ?</p>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                              <form>
+                                  <button type="submit" class="btn btn-danger" formaction="boards/{{proj.id}}/{{r.id}}/deleteRow">
+                                      Удалить
+                                  </button>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
               <hr class="mt-2 mb-4" style="border-color: rgba(135,206,250, 1);">
               {% for t in tasks %}
                     {% if t.row_id == r.id%}
@@ -50,11 +92,13 @@
                                       </div>
                                       <div class="col- ml-auto">
                                           <div class="dropdown">
-                                              <button class="btn btn-info btn-sm dropdown-toggler" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                  ...
+                                              <button class="btn btn-sm dropdown-toggler" type="button"
+                                                      id="dropdownMenuButton" data-toggle="dropdown"
+                                                      aria-haspopup="true" aria-expanded="false" style="background-color: rgba(135,206,250, 0.3);">
+                                                  ⁞
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                  <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#exampleModalCenter-{{p.id}}">
+                                                  <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#deleteTask-{{t.id}}">
                                                       Удалить
                                                   </a>
                                               </div>
@@ -76,7 +120,7 @@
                               </div>
                           </div>
                         </div>
-                        <div class="modal fade" id="exampleModalCenter-{{p.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal fade" id="deleteTask-{{t.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                               <div class="modal-content">
                                 <div class="modal-header">

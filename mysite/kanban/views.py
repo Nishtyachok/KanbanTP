@@ -50,6 +50,28 @@ class DeleteProject(View):
         return redirect('boards')
 
 
+class DeleteRow(View):
+    def get(self, request, id, id_row):
+        try:
+            row = Row.objects.get(id=id_row)
+        except:
+            return redirect(f'/boards/{id}')
+        if request.user.id == row.project.owner_id:
+            row.delete()
+        return redirect(f'/boards/{id}')
+
+
+class DeleteTask(View):
+    def get(self, request, id, id_task):
+        try:
+            task = Task.objects.get(id=id_task)
+        except:
+            return redirect(f'/boards/{id}')
+        if request.user.id == task.assigned_to.id:
+            task.delete()
+        return redirect(f'/boards/{id}')
+
+
 class Tasks(View):
     def get(self, request, id):
         if not request.user.is_authenticated:
@@ -73,14 +95,17 @@ class Tasks(View):
         return render(request, 'tasks.html', data)
 
     def post(self, request, id):
+
         if not request.user.is_authenticated:
             return redirect('/')
+        print(request.POST)
         if request.POST.get('row_add'):
             row_form = RowForm(request.POST)
             if row_form.is_valid():
                 s_form = row_form.save(commit=False)
                 s_form.project = Project.objects.filter(id=id).first()
                 s_form.save()
+
         if request.POST.get('task_add'):
             task_form = TaskForm(request.POST)
             if task_form.is_valid():
@@ -89,6 +114,7 @@ class Tasks(View):
                 s_form.row = Row.objects.filter(id=request.POST.get('row_id')).first()
                 s_form.assigned_to = request.user
                 s_form.save()
+
         return redirect(f'/boards/{id}')
 
 

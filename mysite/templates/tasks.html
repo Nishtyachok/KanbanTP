@@ -83,7 +83,7 @@
               <hr class="mt-2 mb-4" style="border-color: rgba(135,206,250, 1);">
               {% for t in tasks %}
                     {% if t.row_id == r.id%}
-                        <div class="card" style="mt-4">
+                        <div class="card mb-0" style="mt-4">
                           <div class="card-body">
                               <div class="container">
                                   <div class="row">
@@ -118,6 +118,30 @@
                                       </div>
                                   </div>
                               </div>
+                              <form method="POST" >
+                                    {% csrf_token %}
+                                    <input type="hidden" name="rows" value={{rows_all}} />
+                                    <input type="hidden" name="task_id" value={{t.id}} />
+                                    <div class="form-row justify-content-center mt-2">
+
+
+                                        <button type="submit" class="btn btn-sm" name="task_edit_row_left" value={{r.id}}
+                                        style="background: none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-circle" viewBox="0 0 16 16" style="color:green;">
+                                          <path class="arrow" fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+                                        </svg>
+
+                                        </button>
+                                        <button type="submit" class="btn btn-sm" name="task_edit_row_right" value={{r.id}}
+                                        style="background: none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16" style="color:green;">
+                                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                        </svg>
+
+                                        </button>
+
+                                    </div>
+                              </form>
                           </div>
                         </div>
                         <div class="modal fade" id="deleteTask-{{t.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">

@@ -88,6 +88,7 @@ class Tasks(View):
                 "tasks": proj.task_set.all(),
                 'proj': proj,
                 'rows': page_obj,
+                'rows_all': rows,
                 "can_add": user == proj.owner,
                 "row_form": RowForm(),
                 "task_form": TaskForm(),

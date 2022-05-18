@@ -2,41 +2,45 @@
 
 {% block title %} {{proj.name}} {% endblock %}
 {% load crispy_forms_tags %}
-{% block name %}{{proj.name}}{% endblock %}
+{% block name %}
+<div style="
+    display: flex;
+    flex-direction: row;
+padding: 0; justify-content: space-between">
+    {{proj.name}}
+    <!--Кнопка назад -->
+    <div class="form-row justify-content-end">
+        <a class = "button-back-task" href="/boards">
+            <button type="back" class="btn btn-danger mb-2">
+                Назад к доскам
+            </button>
+        </a>
+    </div>
+</div>
+
+{% endblock %}
 {% block content %}
 
         <form method="POST" >
             {% csrf_token %}
             <div class="form-row justify-content-end">
-                <div class="col-3">
+                <div class="col-3" style="min-width:173px;">
                     {{row_form|crispy}}
                 </div>
                 <div>
                     <button type="submit" class="btn btn-success" name="row_add" value="Submit">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
-                    </svg>
                     Добавить колонку
                     </button>
                 </div>
             </div>
         </form>
 
-<!--Кнопка назад -->
-        <div class="form-row justify-content-end">
-            <a class = "button-back-task" href="/boards">
-              <button type="back" class="btn btn-danger mb-2">
-                    Назад к доскам
-                 </button>
-            </a>
-        </div>
-
 <!-- Задачи -->
-    <div class="container">
-      <div class="row" style="">
+    <div class="container " >
+      <div class="row justify-content-center">
           {% for r in rows %}
-          <div class="col-sm-3 h-100 border text-center rounded border-primary"
-                style="background-color: rgba(135,206,250, 0.3);">
+          <div class="col-xl h-100 border text-center rounded border-primary ml-2"
+                style="background-color: rgba(135,206,250, 0.3); max-width: 400px;">
               <div class="container">
                   <div class="row">
                       <div class="col- mt-2">
@@ -83,7 +87,7 @@
               <hr class="mt-2 mb-4" style="border-color: rgba(135,206,250, 1);">
               {% for t in tasks %}
                     {% if t.row_id == r.id%}
-                        <div class="card mb-0" style="mt-4">
+                        <div class="card mb-2">
                           <div class="card-body">
                               <div class="container">
                                   <div class="row">

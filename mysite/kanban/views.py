@@ -1,11 +1,7 @@
-from django.db.models import Q
+
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
 from django.views import View
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from .models import Project, Task, ProjectForm, RowForm, Row, TaskForm, Team
-from guardian.shortcuts import get_objects_for_user, assign_perm
 from django.core.paginator import Paginator
 
 
@@ -99,33 +95,60 @@ class Tasks(View):
 
         if not request.user.is_authenticated:
             return redirect('/')
-        print(request.POST)
+
+        user = request.user
+        user_projects = Project.objects.filter(team__members__id=user.id)
+        project = Project.objects.filter(id=id).first()
+
+        if project not in user_projects:
+            return redirect('/')
+
         if request.POST.get('row_add'):
             row_form = RowForm(request.POST)
             if row_form.is_valid():
                 s_form = row_form.save(commit=False)
-                s_form.project = Project.objects.filter(id=id).first()
+                s_form.project = project
                 s_form.save()
 
         if request.POST.get('task_add'):
             task_form = TaskForm(request.POST)
             if task_form.is_valid():
                 s_form = task_form.save(commit=False)
-                s_form.project = Project.objects.filter(id=id).first()
+                s_form.project = project
                 s_form.row = Row.objects.filter(id=request.POST.get('row_id')).first()
                 s_form.assigned_to = request.user
                 s_form.save()
 
+        if request.POST.get('task_edit_row_right'):
+            task = Task.objects.filter(id=request.POST.get('task_id')).first()
+            rows = list(project.row_set.all())
+            row = Row.objects.filter(id=request.POST.get('task_edit_row_right')).first()
+            print(rows)
+            print(rows.index(row))
+            try:
+                task.row = rows[rows.index(row)+1]
+            except IndexError:
+                task.row = rows[0]
+            task.save()
+        if request.POST.get('task_edit_row_left'):
+            task = Task.objects.filter(id=request.POST.get('task_id')).first()
+            rows = list(project.row_set.all())
+            row = Row.objects.filter(id=request.POST.get('task_edit_row_left')).first()
+            print(rows)
+            print(rows.index(row))
+            try:
+                task.row = rows[rows.index(row)-1]
+                task.save()
+            except IndexError:
+                pass
+
         return redirect(f'/boards/{id}')
 
 
-
-#
-#
 # class ManegeTasks(View):
-#     def post(self, request, id):
-#         if not request.user.is_authenticated:
-#             response = JsonResponse({"error": "Invalid User"})
+#   def post(self, request, id):
+#      if not request.user.is_authenticated:
+#         response = JsonResponse({"error": "Invalid User"})
 #             response.status_code = 403
 #             return response
 #

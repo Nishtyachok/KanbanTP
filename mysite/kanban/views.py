@@ -1,7 +1,7 @@
 
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Project, Task, ProjectForm, RowForm, Row, TaskForm, Team
+from .models import Project, Task, ProjectForm, RowForm, Row, TaskForm, Team, User
 from django.core.paginator import Paginator
 
 
@@ -15,7 +15,12 @@ class Projects(View):
         paginator = Paginator(user_projects, 3)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
+        teams = []
+        for p in user_projects:
+            teams.append(p.team_set.all().first())
+        print(teams)
         data = {"user": user,
+                "teams": teams,
                 "projects": page_obj,
                 'form': ProjectForm()
                 }
@@ -35,45 +40,91 @@ class Projects(View):
         return redirect('boards')
 
 
-class DeleteProject(View):
-    def get(self, request, id):
-        try:
-            proj = Project.objects.get(id=id)
-        except:
-            return redirect('boards')
-        if request.user.id == proj.owner.id:
-            proj.delete()
+def deleteProject(request, id):
+    if not request.user.is_authenticated:
+        return redirect('/')
+
+    try:
+        proj = Project.objects.get(id=id)
+    except:
         return redirect('boards')
 
-
-class DeleteRow(View):
-    def get(self, request, id, id_row):
+    if request.user.id == proj.owner.id:
+        proj.delete()
+    else:
         try:
-            row = Row.objects.get(id=id_row)
+            team = Team.objects.get(project_id=id)
         except:
-            return redirect(f'/boards/{id}')
-        if request.user.id == row.project.owner_id:
-            row.delete()
+            return redirect('boards')
+
+        team.members.remove(request.user)
+        team.save()
+
+    return redirect('boards')
+
+
+def deleteRow(request, id, id_row):
+    if not request.user.is_authenticated:
+        return redirect('/')
+
+    try:
+        row = Row.objects.get(id=id_row)
+    except:
         return redirect(f'/boards/{id}')
 
+    if request.user.id == row.project.owner_id:
+        row.delete()
 
-class DeleteTask(View):
-    def get(self, request, id, id_task):
-        try:
-            task = Task.objects.get(id=id_task)
-        except:
-            return redirect(f'/boards/{id}')
-        if request.user.id == task.assigned_to.id:
-            task.delete()
+    return redirect(f'/boards/{id}')
+
+
+def deleteMember(request, id, id_member):
+    if not request.user.is_authenticated:
+        return redirect('/')
+
+    try:
+        team = Team.objects.get(project_id=id)
+        member = User.objects.get(id=id_member)
+    except:
+        return redirect('boards')
+
+    if request.user.id == team.project.owner_id:
+        team.members.remove(member)
+        team.save()
+
+    return redirect('boards')
+
+
+def deleteTask(request, id, id_task):
+    if not request.user.is_authenticated:
+        return redirect('/')
+
+    try:
+        task = Task.objects.get(id=id_task)
+    except:
         return redirect(f'/boards/{id}')
+
+    if request.user.id == task.assigned_to.id or \
+            request.user.id == task.project.owner.id:
+        task.delete()
+
+    return redirect(f'/boards/{id}')
 
 
 class Tasks(View):
     def get(self, request, id):
-        if not request.user.is_authenticated:
-            return redirect("/")
-        proj = Project.objects.filter(id=id).first()
+
         user = request.user
+
+        if not user.is_authenticated:
+            return redirect("/")
+
+        user_projects = Project.objects.filter(team__members__id=user.id)
+        proj = Project.objects.filter(id=id).first()
+
+        if proj not in user_projects:
+            return redirect('/')
+
         # users = User.objects.filter(Q(id__in=proj.get_members()) | Q(id=proj.owner.id))
         rows = Row.objects.filter(project_id=id)
         paginator = Paginator(rows, 4)

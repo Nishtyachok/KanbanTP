@@ -24,7 +24,7 @@ padding: 0; justify-content: space-between">
         <form method="POST" >
             {% csrf_token %}
             <div class="form-row justify-content-end">
-                <div class="col-3" style="min-width:173px;">
+                <div class="col-3" style="min-width:155px;">
                     {{row_form|crispy}}
                 </div>
                 <div>
@@ -40,7 +40,7 @@ padding: 0; justify-content: space-between">
       <div class="row justify-content-center">
           {% for r in rows %}
           <div class="col-xl h-100 border text-center rounded border-primary ml-2"
-                style="background-color: rgba(135,206,250, 0.3); max-width: 400px;">
+                style="background-color: rgba(135,206,250, 0.3); max-width: 390px;">
               <div class="container">
                   <div class="row">
                       <div class="col- mt-2">

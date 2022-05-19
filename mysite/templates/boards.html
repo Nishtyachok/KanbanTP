@@ -47,12 +47,13 @@
                                 <div class="col-">
                                     <a href="{{p.id}}" class="card-link btn btn-primary" role="button">Перейти</a>
                                 </div>
-                                <div class="col- ml-5">
+                                <div class="col- ml-auto">
                                     <div class="dropdown">
-                                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <button class="btn btn-secondary btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                           Действия
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" data-toggle="modal" data-target="#shareModal-{{p.id}}" href="#">Поделиться</a>
                                           <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#exampleModalCenter-{{p.id}}">
                                               Удалить
                                           </a>
@@ -65,6 +66,30 @@
                 </div>
               </div>
             </div>
+                         <!-- Vertically centered modal -->
+            <div class="modal fade" id="shareModal-{{p.id}}">
+                <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Поделиться</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <input type="text" id="clipboard-{{p.id}}" class="form-control"
+                                 value="http://127.0.0.1:8000/boards/share/{{ p.key }}">
+                        </div>
+                          <div class="modal-footer">
+                              <button class="btn btn-primary" onclick="myFunction('clipboard-{{p.id}}')">
+                                  Скопировать
+                              </button>
+                          </div>
+
+                      </div>
+                    </div>
+            </div>
+
                 <div class="modal fade" id="exampleModalCenter-{{p.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                   <div class="modal-content">
@@ -92,7 +117,14 @@
             {% endfor %}
         </div>
     </div>
-
+    <script>
+      function myFunction(id) {
+        var copyText = document.getElementById(id);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+      }
+     </script>
     <nav aria-label="Page navigation" class="fixed-bottom ">
         <ul class="pagination pagination-lg justify-content-center">
             <li class="page-item">
@@ -127,3 +159,4 @@
         </ul>
     </nav>
 {% endblock %}
+

@@ -145,6 +145,21 @@ class Tasks(View):
         return redirect(f'/boards/{id}')
 
 
+def addMember(request, key):
+    if not request.user.is_authenticated:
+        return redirect('/')
+
+    user = request.user
+    project = Project.objects.filter(key=key).first()
+
+    team = project.team_set.all().first()
+    team.members.add(user)
+    team.save()
+
+    return redirect('boards')
+
+
+
 # class ManegeTasks(View):
 #   def post(self, request, id):
 #      if not request.user.is_authenticated:

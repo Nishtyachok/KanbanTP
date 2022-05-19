@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.forms import ModelForm, TextInput
+import random
 
 
 class Project(models.Model):
@@ -8,11 +9,26 @@ class Project(models.Model):
     description = models.CharField(max_length=200)
     details = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    key = models.CharField(max_length=50, unique=True)
 
     class Meta:
         permissions = (
             ('member_project', 'member project'),
         )
+
+    def generate_key(self):
+        key = ''.join(random.choice('0123456789') for x in range(8))
+
+        if Project.objects.filter(key=key).exists():
+            return self.generate_key()
+
+        return key
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+
+        return super(Project, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -23,7 +39,7 @@ class ProjectForm(ModelForm):
     class Meta:
         model = Project
         fields = '__all__'
-        exclude = ('owner',)
+        exclude = ('owner', 'key')
 
 
 class Row(models.Model):

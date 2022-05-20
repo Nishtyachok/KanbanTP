@@ -88,11 +88,11 @@ padding: 0; justify-content: space-between">
               {% for t in tasks %}
                     {% if t.row_id == r.id%}
                         <div class="card mb-2">
-                          <div class="card-body">
-                              <div class="container">
-                                  <div class="row">
-                                      <div class="col-">
-                                          <h5 class="card-title">{{t.name}}</h5>
+                          <div class="card-body" >
+                              <div class="container " >
+                                  <div class="row border-bottom">
+                                      <div class="col- ">
+                                          <h5 class="card-title d-inline-block text-truncate" style="max-width: 150px;">{{t.name}}</h5>
                                       </div>
                                       <div class="col- ml-auto">
                                           <div class="dropdown">
@@ -111,9 +111,9 @@ padding: 0; justify-content: space-between">
                                   </div>
                               </div>
 
-                              <p class="card-text">{{t.description}}</p>
-                              <div class="container">
-                                  <div class="row">
+                              <p class="card-text border-bottom">{{t.description}}</p>
+                              <div class="container ">
+                                  <div class="row ">
                                       <div class="col-">
                                            <h6 class="card-subtitle mb-2 text-muted">{{t.assigned_to}}</h6>
                                       </div>

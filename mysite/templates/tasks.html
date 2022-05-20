@@ -39,9 +39,9 @@ padding: 0; justify-content: space-between">
     <div class="container " >
       <div class="row justify-content-center">
           {% for r in rows %}
-          <div class="col-lg h-100 border text-center rounded border-primary ml-2"
+          <div class="col-xl h-100 border text-center rounded border-primary ml-2"
                 style="background-color: rgba(135,206,250, 0.3); max-width: 390px;">
-              <div class="container">
+              <div class="container ">
                   <div class="row">
                       <div class="col- mt-2">
                           <h5>{{ r.name }}</h5>
@@ -87,15 +87,15 @@ padding: 0; justify-content: space-between">
               <hr class="mt-2 mb-4" style="border-color: rgba(135,206,250, 1);">
               {% for t in tasks %}
                     {% if t.row_id == r.id%}
-                        <div class="card mb-2" style="width: 18rem;">
+                        <div class="card mb-2 mx-auto " style="width: 15.3rem;">
                           <div class="card-body" >
                               <div class="container " >
-                                  <div class="row border-bottom">
+                                  <div class="row border-bottom ">
                                       <div class="col- ">
-                                          <h6 class="card-titletext-wrap" style="width: 6rem;">{{t.name}}</h6>
+                                          <h6 class="card-title text-wrap" style="width: 10rem;">{{t.name}}</h6>
                                       </div>
                                       <div class="col- ml-auto">
-                                          <div class="dropdown">
+                                          <div class="dropdown mb-3">
                                               <button class="btn btn-sm dropdown-toggler" type="button"
                                                       id="dropdownMenuButton" data-toggle="dropdown"
                                                       aria-haspopup="true" aria-expanded="false" style="background-color: rgba(135,206,250, 0.3);">

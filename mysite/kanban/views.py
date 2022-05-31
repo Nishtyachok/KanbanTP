@@ -31,11 +31,19 @@ class Projects(View):
             return redirect('/')
         user = request.user
 
-        form = ProjectForm(request.POST)
-        if form.is_valid():
-            s_form = form.save(commit=False)
-            s_form.owner = user
-            s_form.save()
+        if request.POST.get('project_add'):
+            form = ProjectForm(request.POST)
+            if form.is_valid():
+                s_form = form.save(commit=False)
+                s_form.owner = user
+                s_form.save()
+
+        if request.POST.get('project_update'):
+            proj = Project.objects.filter(id=request.POST.get('project_update')).first()
+            proj.name = request.POST.get('updateProjectName')
+            proj.description = request.POST.get('updateProjectDescription')
+            proj.details = request.POST.get('updateProjectDetails')
+            proj.save()
 
         return redirect('boards')
 
@@ -169,6 +177,13 @@ class Tasks(View):
                 s_form.row = Row.objects.filter(id=request.POST.get('row_id')).first()
                 s_form.assigned_to = request.user
                 s_form.save()
+
+        if request.POST.get('task_update'):
+            task = Task.objects.filter(id=request.POST.get('task_update')).first()
+            task.name = request.POST.get('updateTaskName')
+            task.description = request.POST.get('updateTaskDescription')
+            task.end_time = request.POST.get('updateTaskTime')
+            task.save()
 
         if request.POST.get('task_edit_row_right'):
             task = Task.objects.filter(id=request.POST.get('task_id')).first()

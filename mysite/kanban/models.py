@@ -7,7 +7,7 @@ import random
 class Project(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=200)
-    details = models.TextField()
+    details = models.TextField(max_length=500)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     key = models.CharField(max_length=50, unique=True)
 

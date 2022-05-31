@@ -102,6 +102,7 @@ padding: 0; justify-content: space-between">
                                                   ⁞
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#updateTask-{{t.id}}">Изменить</a>
                                                   <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#deleteTask-{{t.id}}">
                                                       Удалить
                                                   </a>
@@ -110,6 +111,41 @@ padding: 0; justify-content: space-between">
                                       </div>
                                   </div>
                               </div>
+                              <!-- Update task Modal -->
+                                <div class="modal fade" id="updateTask-{{t.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="updateTaskModalLabel">Изменить задачу</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                          <form method="POST">
+                                              {% csrf_token %}
+                                              <div class="form-group">
+                                                  <label for="updateTaskName">Название</label>
+                                                  <input type="text" class="form-control" name="updateTaskName" value="{{ t.name }}" id="updateTaskName">
+                                              </div>
+                                               <div class="form-group">
+                                                  <label for="updateTaskDescription">Описание</label>
+                                                  <input type="text" class="form-control" name="updateTaskDescription" value="{{ t.description }}" id="updateTaskDescription">
+                                              </div>
+                                              <div class="form-group">
+                                                  <label for="updateTaskTime">Выполнить до</label>
+                                                  <div class="md-form md-outline input-with-post-icon datepicker">
+                                                      <input placeholder="Select date" type="date" id="updateTaskTime" data-date-format="dd-mm-yyyy" name="updateTaskTime" value="" class="form-control">
+                                                  </div>
+                                              </div>
+
+
+                                              <button type="submit" class="btn btn-primary mt-4" name="task_update" value="{{ t.id }}">Сохранить изменения</button>
+                                          </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
 
                               <p class="card-text mt-3 ">{{t.description}}</p>
                               <div class="container border-top ">
@@ -118,7 +154,7 @@ padding: 0; justify-content: space-between">
                                            <h6 class="card-subtitle mb-2 text-muted">{{t.assigned_to}}</h6>
                                       </div>
                                       <div class="col- ">
-                                            <h6 class="card-subtitle mb-2 text-muted">{{t.start_time}}</h6>
+                                            <h6 class="card-subtitle mb-2 text-muted">{{t.end_time}}</h6>
                                       </div>
                                   </div>
                               </div>

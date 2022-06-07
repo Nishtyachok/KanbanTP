@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block title %} {{proj.name}} {% endblock %}
+{% load crispy_forms_tags %}
+{% block name %}
+<div style="
+    display: flex;
+    flex-direction: row;
+padding: 0; justify-content: space-between">
+    {{proj.name}}
+    <!--Кнопка назад -->
+    <div class="form-row justify-content-end">
+        <a class = "button-back-task" href="/boards">
+            <button type="back" class="btn btn-danger mb-2">
+                Назад к доскам
+            </button>
+        </a>
+    </div>
+</div>
+
+{% endblock %}
+{% block content %}
+
+        <form method="POST" >
+            {% csrf_token %}
+            <div class="form-row justify-content-end">
+                <div class="col-3" style="min-width:155px;">
+                    {{row_form|crispy}}
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-success" name="row_add" value="Submit">
+                    Добавить колонку
+                    </button>
+                </div>
+            </div>
+        </form>
+
+<!-- Задачи -->
+    <div class="container " >
+      <div class="row justify-content-center">
+          {% for r in rows %}
+          <div class="col-xl h-100 border text-center rounded border-primary ml-2"
+                style="background-color: rgba(135,206,250, 0.3); max-width: 390px;">
+              <div class="container ">
+                  <div class="row">
+                      <div class="col- mt-2">
+                          <h5>{{ r.name }}</h5>
+                      </div>
+                      <div class="col- ml-auto">
+                          <div class="dropdown">
+                              <button class="btn btn-sm dropdown-toggler mt-2" type="button" id="dropdownMenuButton1"
+                                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: rgba(135,206,250, 0.3);">
+                                  ☰
+                              </button>
+                              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                  <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#deleteRow-{{r.id}}">
+                                      Удалить
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal fade" id="deleteRow-{{r.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="deleteRowTitle">Удаление</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                              </button>
+                          </div>
+                          <div class="modal-body">
+                              <p> Вы действительно хотите удалить {{r.name}} ?</p>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                              <form>
+                                  <button type="submit" class="btn btn-danger" formaction="boards/{{proj.id}}/{{r.id}}/deleteRow">
+                                      Удалить
+                                  </button>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr class="mt-2 mb-4" style="border-color: rgba(135,206,250, 1);">
+              {% for t in tasks %}
+                    {% if t.row_id == r.id%}
+                        <div class="card mb-2 mx-auto " style="width: 15.3rem;">
+                          <div class="card-body" >
+                              <div class="container " >
+                                  <div class="row border-bottom ">
+                                      <div class="col- ">
+                                          <h6 class="card-title text-wrap" style="width: 10rem;">{{t.name}}</h6>
+                                      </div>
+                                      <div class="col- ml-auto">
+                                          <div class="dropdown mb-3">
+                                              <button class="btn btn-sm dropdown-toggler" type="button"
+                                                      id="dropdownMenuButton" data-toggle="dropdown"
+                                                      aria-haspopup="true" aria-expanded="false" style="background-color: rgba(135,206,250, 0.3);">
+                                                  ⁞
+                                              </button>
+                                              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#updateTask-{{t.id}}">Изменить</a>
+                                                  <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#deleteTask-{{t.id}}">
+                                                      Удалить
+                                                  </a>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <!-- Update task Modal -->
+                                <div class="modal fade" id="updateTask-{{t.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="updateTaskModalLabel">Изменить задачу</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                          <form method="POST">
+                                              {% csrf_token %}
+                                              <div class="form-group">
+                                                  <label for="updateTaskName">Название</label>
+                                                  <input type="text" class="form-control" name="updateTaskName" value="{{ t.name }}" id="updateTaskName">
+                                              </div>
+                                               <div class="form-group">
+                                                  <label for="updateTaskDescription">Описание</label>
+                                                  <input type="text" class="form-control" name="updateTaskDescription" value="{{ t.description }}" id="updateTaskDescription">
+                                              </div>
+                                              <div class="form-group">
+                                                  <label for="updateTaskTime">Выполнить до</label>
+                                                  <div class="md-form md-outline input-with-post-icon datepicker">
+                                                      <input placeholder="Select date" type="date" id="updateTaskTime" data-date-format="dd-mm-yyyy" name="updateTaskTime" value="" class="form-control">
+                                                  </div>
+                                              </div>
+
+
+                                              <button type="submit" class="btn btn-primary mt-4" name="task_update" value="{{ t.id }}">Сохранить изменения</button>
+                                          </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                              <p class="card-text mt-3 ">{{t.description}}</p>
+                              <div class="container border-top ">
+                                  <div class="row mt-3 justify-content-around">
+                                      <div class="col-">
+                                           <h6 class="card-subtitle mb-2 text-muted">{{t.assigned_to}}</h6>
+                                      </div>
+                                      <div class="col- ">
+                                            <h6 class="card-subtitle mb-2 text-muted">{{t.end_time}}</h6>
+                                      </div>
+                                  </div>
+                              </div>
+                              <form method="POST" >
+                                    {% csrf_token %}
+                                    <input type="hidden" name="rows" value={{rows_all}} />
+                                    <input type="hidden" name="task_id" value={{t.id}} />
+                                    <div class="form-row justify-content-center mt-2">
+
+
+                                        <button type="submit" class="btn btn-sm" name="task_edit_row_left" value={{r.id}}
+                                        style="background: none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-circle" viewBox="0 0 16 16" style="color:green;">
+                                          <path class="arrow" fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+                                        </svg>
+
+                                        </button>
+                                        <button type="submit" class="btn btn-sm" name="task_edit_row_right" value={{r.id}}
+                                        style="background: none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16" style="color:green;">
+                                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                        </svg>
+
+                                        </button>
+
+                                    </div>
+                              </form>
+                          </div>
+                        </div>
+                        <div class="modal fade" id="deleteTask-{{t.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLongTitle">Удаление</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p> Вы действительно хотите удалить {{t.name}} ?</p>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                                    <form>
+                                        <button type="submit" class="btn btn-danger" formaction="boards/{{proj.id}}/{{t.id}}/deleteTask">
+                                           Удалить
+                                         </button>
+                                    </form>
+
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                    {% endif %}
+              {% endfor %}
+              <button type="button-task" class="btn btn-primary btn-sm mb-4 mt-2"  data-toggle="modal" data-target="#ModalTask-{{r.id}}" style="background-color:green">Добавить задачу</button>
+                <!--Form Задачи-->
+              <div class="modal fade" id="ModalTask-{{r.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Задача</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                              </button>
+                          </div>
+                          <div class="modal-body">
+                               <form method="POST" class="form-group">
+                                    {% csrf_token %}
+                                    {{ task_form|crispy }}
+                                    <input type="hidden" name="row_id" value={{r.id}} />
+                                    <button type="submit" class="btn btn-success" name="task_add" value="Submit">Добавить задачу</button>
+                               </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          {% endfor %}
+      </div>
+    </div>
+
+    <nav aria-label="Page navigation" class="fixed-bottom ">
+        <ul class="pagination pagination-lg justify-content-center">
+            <li class="page-item">
+                    {% if rows.has_previous%}
+                        <a class="page-link" href="?page={{ rows.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    {% else %}
+                        <a class="page-link" href="?page=1" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                          <span class="sr-only">Previous</span>
+                        </a>
+                    {% endif%}
+            </li>
+            <li class="page-item">
+                {% if rows.has_next %}
+                    <a class="page-link" href="?page={{ rows.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                {% else %}
+                    <a class="page-link" href="?page={{ rows.paginator.num_pages }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+{% endblock %}

@@ -2,7 +2,241 @@
 {% load static %}
 
 {% block title %} Kanban boards{% endblock %}
+{% load crispy_forms_tags %}
 {% block name %} Kanban boards {% endblock %}
 {% block content%}
-    <p> Тут будет находиться список ваших канбан досок...</p>
+    <div class="d-flex flex-row-reverse">
+        <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#myModal">Создать</button>
+
+
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Создание новой канбан доски</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">
+                         <form method="POST" class="form-group">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <button type="submit" class="btn btn-success mt-4" name="project_add" value="Submit">
+                                Создать
+                            </button>
+                         </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-4">
+        <div class="row  justify-content-md-center">
+            {% for p in projects %}
+            <div class="col-md-auto">
+              <div class="p-2">
+                <div class="card" style="width: 18rem; background-color: #FF00FF;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ p.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ p.description }}</h6>
+                        <p class="card-text">{{ p.details }}</p>
+                        <div class="container">
+                            <div class="row justify-content-md-center">
+                                <div class="col-">
+                                    <a href="{{p.id}}" class="card-link btn btn-primary" role="button">Перейти</a>
+                                </div>
+                                <div class="col- ml-auto">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                          Действия
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" data-toggle="modal" data-target="#updateProject-{{p.id}}" href="#">Изменить</a>
+                                             <a href="#" class="dropdown-item" data-toggle="modal" data-target="#memberList-{{p.id}}">
+                                                Участники
+                                            </a>
+                                            <a class="dropdown-item" data-toggle="modal" data-target="#shareModal-{{p.id}}" href="#">Поделиться</a>
+                                          <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#exampleModalCenter-{{p.id}}">
+                                              Удалить
+                                          </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <!-- Update task Modal -->
+            <div class="modal fade" id="updateProject-{{p.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="updateProjectModalLabel">Изменить доску</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="updateTaskName">Название</label>
+                                    <input type="text" class="form-control" name="updateProjectName" value="{{ p.name }}" id="updateTaskName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="updateTaskDescription">Описание</label>
+                                    <input type="text" class="form-control" name="updateProjectDescription" value="{{ p.description }}" id="updateProjectDescription">
+                                </div>
+                                <div class="form-group">
+                                    <label for="updateTaskDetails">Детали</label>
+                                    <div class="md-form md-outline input-with-post-icon datepicker">
+                                        <textarea type="text" class="form-control" name="updateProjectDetails" id="updateProjectDetails" rows="4">{{ p.details }}</textarea>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-4" name="project_update" value="{{ p.id }}">Сохранить изменения</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                         <!-- Vertically centered modal -->
+            <div class="modal fade" id="shareModal-{{p.id}}">
+                <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Поделиться</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <input type="text" id="clipboard-{{p.id}}" class="form-control"
+                                 value="http://127.0.0.1:8000/boards/share/{{ p.key }}">
+                        </div>
+                          <div class="modal-footer">
+                              <button class="btn btn-primary" onclick="myFunction('clipboard-{{p.id}}')">
+                                  Скопировать
+                              </button>
+                          </div>
+
+                      </div>
+                    </div>
+            </div>
+
+             <div class="modal fade" id="memberList-{{p.id}}">
+                <div class="modal-dialog ">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Участники проекта</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                            {% for team in teams %}
+                                {% if team.project.id == p.id %}
+                                    {% for m in team.members.all %}
+                                    <div class="d-flex p-2 justify-content-between">
+                                        <div class="p-2">{{m}}</div>
+                                        {% if m.id == p.owner.id %}
+                                             <div class="p-2 font-weight-bold" style="color: green;">
+                                                Создатель
+                                            </div>
+                                        {% else %}
+                                            {% if user.id == p.owner.id %}
+                                                <div class="p">
+                                                    <form>
+                                                        <button type="submit" class="btn btn-sm btn-danger rounded-circle " formaction="{{p.id}}/{{m.id}}/deleteMember" >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-x" viewBox="0 0 16 16">
+                                                              <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                                                              <path fill-rule="evenodd" d="M12.146 5.146a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+
+                        </div>
+                      </div>
+                    </div>
+            </div>
+
+                <div class="modal fade" id="exampleModalCenter-{{p.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle">Удаление</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                        <p> Вы действительно хотите удалить {{p.name}} ?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <form>
+                            <button type="submit" class="btn btn-danger" formaction="{{p.id}}/deleteProject">
+                               Удалить
+                             </button>
+                        </form>
+
+                    </div>
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+      function myFunction(id) {
+        var copyText = document.getElementById(id);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+      }
+     </script>
+    <nav aria-label="Page navigation" class="fixed-bottom ">
+        <ul class="pagination pagination-lg justify-content-center">
+            <li class="page-item">
+                    {% if projects.has_previous%}
+                        <a class="page-link" href="?page={{ projects.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    {% else %}
+                        <a class="page-link" href="?page=1" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                          <span class="sr-only">Previous</span>
+                        </a>
+                    {% endif%}
+            </li>
+            {% for i in projects.paginator.page_range %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endfor %}
+            <li class="page-item">
+                {% if projects.has_next %}
+                    <a class="page-link" href="?page={{ projects.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                {% else %}
+                    <a class="page-link" href="?page={{ projects.paginator.num_pages }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
 {% endblock %}
+

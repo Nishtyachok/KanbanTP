@@ -1,9 +1,6 @@
 # Jetbrains
 .idea/
 
-#Django
-mysite/mysite/settings/local.py
-
 # Database
 db.sqlite3
 

@@ -53,3 +53,5 @@ python manage.py runserver
 Далее в браузере переходим по ссылке http://127.0.0.1:8000/.
 
 ---
+И видим что все у нас работает
+![Screenshot_1](https://user-images.githubusercontent.com/51389727/172386152-7089b3bd-b2bd-4898-b1ae-af39bb839eb3.png)
